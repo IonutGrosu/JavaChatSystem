@@ -1,5 +1,12 @@
 package chat.client.model;
 
-public interface ModelInterface
+import chat.shared.util.Subject;
+
+public interface ModelInterface extends Subject
 {
+    void setUsername(String username);
+
+    void startClient();
+
+    void sendMessage(String message);
 }

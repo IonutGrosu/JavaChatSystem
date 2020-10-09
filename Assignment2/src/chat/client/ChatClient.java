@@ -4,6 +4,7 @@ import chat.client.core.ClientFactory;
 import chat.client.core.ModelFactory;
 import chat.client.core.ViewHandler;
 import chat.client.core.ViewModelFactory;
+import chat.client.network.ClientInterface;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

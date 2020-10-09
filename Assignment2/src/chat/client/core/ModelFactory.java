@@ -15,7 +15,7 @@ public class ModelFactory
 
   public ModelInterface getModel()
   {
-    if (model == null) model = new Model();
+    if (model == null) model = new Model(cf.getClient());
     return model;
   }
 }
