@@ -4,9 +4,7 @@ import chat.shared.util.Subject;
 
 public interface ModelInterface extends Subject
 {
-    void setUsername(String username);
-
-    void startClient();
+    void startClient(String username);
 
     void sendMessage(String message);
 }

@@ -18,13 +18,14 @@ public class ServerHandler implements Runnable {
     private ObjectInputStream inFromClient;
     private ObjectOutputStream outToClient;
 
-    private String userName;
-
     public ServerHandler(Socket socket, ConnectionPool cp)
     {
         this.socket = socket;
         this.cp = cp;
-        cp.addListener(RequestType.SEND_ALL.toString(), this::sendMessageToAll);
+
+        cp.addListener(RequestType.SEND_PUBLIC.toString(), this::sendMessageToAll);
+        cp.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::updateActiveUsers);
+
         try
         {
             inFromClient = new ObjectInputStream(socket.getInputStream());
@@ -32,6 +33,14 @@ public class ServerHandler implements Runnable {
         }
         catch (IOException e)
         {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateActiveUsers(PropertyChangeEvent propertyChangeEvent) {
+        try {
+            outToClient.writeObject(propertyChangeEvent.getNewValue());
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -51,61 +60,22 @@ public class ServerHandler implements Runnable {
         {
             while (true) {
                 Request clientRequest = (Request) inFromClient.readObject();
-                System.out.println((Message)clientRequest.getArg());
                 switch (clientRequest.getType())
                 {
-                    case SEND:
+                    case NEW_USER:
+                        cp.addActiveUser((String)clientRequest.getArg());
                         break;
-                    case SEND_ALL:
+                    case SEND_PRIVATE:
+                        break;
+                    case SEND_PUBLIC:
                         cp.sendToAll(clientRequest);
-                        break;
-                    case RECEIVE:
-                        break;
-                    case RECEIVE_ALL:
                         break;
                 }
             }
-
-
-//            userName = (String) inFromClient.readObject();
-//            System.out.println(userName);
-//            while (true)
-//            {
-//                Message message = (Message) inFromClient.readObject();
-//
-//                String body = message.getMessageBody();
-//                System.out.println(message);
-//
-//                if (body.equalsIgnoreCase("exit")) {
-//                    cp.removeConnection(this);
-//                    outToClient.writeObject(message);
-//                    socket.close();
-//                    break;
-//                }
-//
-//                cp.broadcast(message);
-//            }
         }
         catch (IOException | ClassNotFoundException e)
         {
             e.printStackTrace();
         }
-    }
-
-    public void sendMessageToClient(Message msg)
-    {
-        try
-        {
-            outToClient.writeObject(msg);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public String getClientName()
-    {
-        return userName;
     }
 }

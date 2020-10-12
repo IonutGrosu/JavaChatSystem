@@ -1,8 +1,10 @@
 package chat.shared.transferObjects;
 
 public enum RequestType {
-    SEND,
-    SEND_ALL,
-    RECEIVE,
-    RECEIVE_ALL
+    NEW_USER,
+    UPDATE_ACTIVE_USERS,
+    SEND_PRIVATE,
+    SEND_PUBLIC,
+    RECEIVE_PRIVATE,
+    RECEIVE_PUBLIC
 }

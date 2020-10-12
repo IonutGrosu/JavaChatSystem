@@ -4,12 +4,12 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
     private String messageBody;
-    private String user;
+    private String sender;
 
     public Message(String messageBody, String user)
     {
         this.messageBody = messageBody;
-        this.user = user;
+        this.sender = user;
     }
 
     public String getMessageBody()
@@ -17,13 +17,13 @@ public class Message implements Serializable {
         return messageBody;
     }
 
-    public String getUser()
+    public String getSender()
     {
-        return user;
+        return sender;
     }
 
     @Override public String toString()
     {
-        return user + ": " + messageBody;
+        return sender + ": " + messageBody;
     }
 }

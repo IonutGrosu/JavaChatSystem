@@ -1,19 +1,24 @@
 package chat.server.model;
 
+import chat.shared.transferObjects.Message;
 import chat.shared.transferObjects.Request;
+import chat.shared.transferObjects.RequestType;
 import chat.shared.util.Subject;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 
 public class ConnectionPool implements Subject {
 
     private PropertyChangeSupport support;
 
+    private ArrayList<String> activeUsers;
+
     public ConnectionPool()
     {
         support = new PropertyChangeSupport(this);
+        activeUsers = new ArrayList<>();
     }
-
 
     @Override
     public void addListener(String eventName, PropertyChangeListener listener) {
@@ -26,6 +31,24 @@ public class ConnectionPool implements Subject {
     }
 
     public void sendToAll(Request clientRequest) {
-        support.firePropertyChange(clientRequest.getType().toString(), null, clientRequest);
+        Message messageToSend = (Message)clientRequest.getArg();
+        if (!messageToSend.getMessageBody().equals(""))
+        {
+            support.firePropertyChange(clientRequest.getType().toString(), null, clientRequest);
+        }
+    }
+
+    public void addActiveUser(String user)
+    {
+        activeUsers.add(user);
+        System.out.println("Active users: " + activeUsers);
+        Request updateUsersRequest = new Request(RequestType.UPDATE_ACTIVE_USERS, activeUsers);
+        support.firePropertyChange(updateUsersRequest.getType().toString(), null, updateUsersRequest);
+    }
+
+    public void removeActiveUser(String user)
+    {
+        activeUsers.remove(user);
+        System.out.println("Active users: " + activeUsers);
     }
 }

@@ -16,7 +16,12 @@ public class Model implements ModelInterface
         support = new PropertyChangeSupport(this);
 
         this.client = client;
-        client.addListener(RequestType.SEND_ALL.toString(), this::receiveMessage);
+        client.addListener(RequestType.SEND_PUBLIC.toString(), this::receiveMessage);
+        client.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::updateActiveUsers);
+    }
+
+    private void updateActiveUsers(PropertyChangeEvent propertyChangeEvent) {
+        support.firePropertyChange(propertyChangeEvent);
     }
 
     private void receiveMessage(PropertyChangeEvent propertyChangeEvent) {
@@ -24,14 +29,8 @@ public class Model implements ModelInterface
     }
 
     @Override
-    public void setUsername(String username) {
-        client.setUsername(username);
-        System.out.println("username in model: " + username);
-    }
-
-    @Override
-    public void startClient() {
-        client.startClient();
+    public void startClient(String username) {
+        client.startClient(username);
     }
 
     @Override

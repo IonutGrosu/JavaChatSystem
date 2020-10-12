@@ -19,14 +19,11 @@ public class LoginController implements ViewController
     this.vh = vh;
     this.vm = vmf.getLoginVM();
 
-    usernameTextField.textProperty().bindBidirectional(vm.getUsernameProperty());
   }
 
   public void onLoginButton(ActionEvent actionEvent)
   {
-    System.out.println("username in controller: " + usernameTextField.textProperty().getValue());
     vh.openChatsView();
-    vm.setUsername();
-    vm.startClient();
+    vm.startClient(usernameTextField.textProperty().getValue());
   }
 }
