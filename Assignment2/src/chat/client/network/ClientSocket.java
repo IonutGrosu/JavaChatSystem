@@ -10,14 +10,18 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ClientSocket implements ClientInterface{
 
     private final PropertyChangeSupport support;
 
+    Socket socket;
+
     ObjectOutputStream outToServer;
 
     private String username;
+    private Boolean socketClosed;
 
     public ClientSocket(){
         support = new PropertyChangeSupport(this);
@@ -26,8 +30,10 @@ public class ClientSocket implements ClientInterface{
     public void startClient(String username)
     {
         this.username = username;
+        support.firePropertyChange(RequestType.NEW_USER.toString(), null, username);
         try {
-            Socket socket = new Socket("localhost", 12345);
+            socket = new Socket("localhost", 12345);
+            socketClosed = false;
 
             outToServer = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream inFromServer = new ObjectInputStream(socket.getInputStream());
@@ -44,14 +50,19 @@ public class ClientSocket implements ClientInterface{
 
     private void listenToServer(ObjectOutputStream outToServer, ObjectInputStream inFromServer) {
         try {
-            while (true){
+            while (!socketClosed){
                 Request requestFromServer = (Request)inFromServer.readObject();
+
+                if (requestFromServer.getType().equals(RequestType.UPDATE_ACTIVE_USERS)){
+                    ArrayList<String> list =(ArrayList<String>) requestFromServer.getArg();
+                    System.out.println("user list from server: "+list.toString());
+                }
 
                 support.firePropertyChange(requestFromServer.getType().toString(), null, requestFromServer.getArg());
 
             }
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -61,6 +72,18 @@ public class ClientSocket implements ClientInterface{
         Request sendMessageRequest = new Request(RequestType.SEND_PUBLIC, m);
         try {
             outToServer.writeObject(sendMessageRequest);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void disconnectUser() {
+        Request disconnectUserRequest = new Request(RequestType.DISCONNECT, username);
+        try {
+            outToServer.writeObject(disconnectUserRequest);
+            socket.close();
+            socketClosed = true;
         } catch (IOException e) {
             e.printStackTrace();
         }

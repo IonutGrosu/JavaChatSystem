@@ -1,13 +1,13 @@
 package chat.client.core;
 
-import chat.client.view.chats.ChatsViewModel;
+import chat.client.view.publicChat.PublicChatViewModel;
 import chat.client.view.login.LoginViewModel;
 
 public class ViewModelFactory
 {
   private ModelFactory mf;
   private LoginViewModel loginVM;
-  private ChatsViewModel chatsVM;
+  private PublicChatViewModel chatsVM;
 
   public ViewModelFactory(ModelFactory mf)
   {
@@ -19,9 +19,9 @@ public class ViewModelFactory
     if (loginVM == null) loginVM = new LoginViewModel(mf.getModel());
     return loginVM;
   }
-  public ChatsViewModel getChatsVM()
+  public PublicChatViewModel getChatsVM()
   {
-    if (chatsVM == null) chatsVM = new ChatsViewModel(mf.getModel());
+    if (chatsVM == null) chatsVM = new PublicChatViewModel(mf.getModel());
     return chatsVM;
   }
 }

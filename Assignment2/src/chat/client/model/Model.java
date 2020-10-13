@@ -18,6 +18,11 @@ public class Model implements ModelInterface
         this.client = client;
         client.addListener(RequestType.SEND_PUBLIC.toString(), this::receiveMessage);
         client.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::updateActiveUsers);
+        client.addListener(RequestType.NEW_USER.toString(), this::getUsername);
+    }
+
+    private void getUsername(PropertyChangeEvent propertyChangeEvent) {
+        support.firePropertyChange(propertyChangeEvent);
     }
 
     private void updateActiveUsers(PropertyChangeEvent propertyChangeEvent) {
@@ -36,6 +41,11 @@ public class Model implements ModelInterface
     @Override
     public void sendMessage(String message) {
         client.sendMessageToAll(message);
+    }
+
+    @Override
+    public void disconnectUser() {
+        client.disconnectUser();
     }
 
     @Override

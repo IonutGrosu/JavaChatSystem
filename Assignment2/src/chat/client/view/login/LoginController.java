@@ -4,8 +4,11 @@ import chat.client.core.ViewHandler;
 import chat.client.core.ViewModelFactory;
 import chat.client.view.ViewController;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 public class LoginController implements ViewController
 {
@@ -19,11 +22,19 @@ public class LoginController implements ViewController
     this.vh = vh;
     this.vm = vmf.getLoginVM();
 
+    usernameTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+      @Override
+      public void handle(KeyEvent keyEvent) {
+        if (keyEvent.getCode().equals(KeyCode.ENTER))
+          onLoginButton();
+      }
+    });
+
   }
 
-  public void onLoginButton(ActionEvent actionEvent)
+  public void onLoginButton()
   {
-    vh.openChatsView();
+    vh.openPublicChatView();
     vm.startClient(usernameTextField.textProperty().getValue());
   }
 }

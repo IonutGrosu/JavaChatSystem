@@ -1,7 +1,6 @@
 package chat.server.network;
 
 import chat.server.model.ConnectionPool;
-import chat.shared.transferObjects.Message;
 import chat.shared.transferObjects.Request;
 import chat.shared.transferObjects.RequestType;
 
@@ -10,6 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServerHandler implements Runnable {
     private Socket socket;
@@ -18,13 +18,18 @@ public class ServerHandler implements Runnable {
     private ObjectInputStream inFromClient;
     private ObjectOutputStream outToClient;
 
+    private String username;
+    private Boolean socketClosed;
+
     public ServerHandler(Socket socket, ConnectionPool cp)
     {
         this.socket = socket;
+        socketClosed = false;
         this.cp = cp;
 
         cp.addListener(RequestType.SEND_PUBLIC.toString(), this::sendMessageToAll);
         cp.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::updateActiveUsers);
+        cp.addListener(RequestType.CLOSE_SOCKET.toString(), this::closeSocket);
 
         try
         {
@@ -37,11 +42,26 @@ public class ServerHandler implements Runnable {
         }
     }
 
+    private void closeSocket(PropertyChangeEvent propertyChangeEvent) {
+        if (this.username.equals((String)propertyChangeEvent.getNewValue()))
+        {
+            try {
+                socket.close();
+                socketClosed = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void updateActiveUsers(PropertyChangeEvent propertyChangeEvent) {
         try {
+            Request request = (Request) propertyChangeEvent.getNewValue();
+            ArrayList<String> list = (ArrayList<String>) request.getArg();
+            System.out.println("user list sent to the user: "+list.toString());
             outToClient.writeObject(propertyChangeEvent.getNewValue());
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
@@ -58,12 +78,16 @@ public class ServerHandler implements Runnable {
     {
         try
         {
-            while (true) {
+            while (!socketClosed) {
                 Request clientRequest = (Request) inFromClient.readObject();
                 switch (clientRequest.getType())
                 {
                     case NEW_USER:
                         cp.addActiveUser((String)clientRequest.getArg());
+                        this.username = (String)clientRequest.getArg();
+                        break;
+                    case DISCONNECT:
+                        cp.removeActiveUser((String)clientRequest.getArg());
                         break;
                     case SEND_PRIVATE:
                         break;

@@ -1,0 +1,68 @@
+.root{
+    -fx-background-color: #121212;
+}
+/*HBox{*/
+/*    -fx-padding: 5px;*/
+/*}*/
+
+.left{
+    -fx-alignment: center-left;
+}
+
+.right{
+    -fx-alignment: center-right;
+}
+
+.hBoxMessageContainer{
+}
+
+.vBoxMessageContainer{
+    -fx-padding: 5px;
+}
+
+.messageUsernameLabel{
+    -fx-padding: 0 15 0 15;
+    -fx-text-fill: white;
+}
+
+.messageBodyLabel{
+    -fx-background-color: #fed766;
+    -fx-background-radius: 24px;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-max-width: 300px;
+    -fx-padding: 5 15 5 15;
+}
+
+ScrollPane{
+    -fx-background-color: #272727;
+}
+
+TextField{
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10;
+}
+
+.yellowText {
+    -fx-text-fill: #fed766;
+}
+
+.errorLabel{
+    -fx-text-fill: #ff5968;
+    -fx-font-weight: bold;
+}
+
+Button{
+    -fx-background-color: #74c69d;
+    -fx-background-radius: 10px;
+    -fx-font-weight: bold;
+}
+
+ScrollPane > .viewport{
+    -fx-background-color: transparent;
+}
+
+ScrollPane{
+    -fx-background-radius: 12px;
+    -fx-background-color: #272727;
+}

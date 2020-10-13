@@ -6,4 +6,6 @@ public interface ClientInterface extends Subject {
     void startClient(String username);
 
     void sendMessageToAll(String message);
+
+    void disconnectUser();
 }

@@ -41,14 +41,15 @@ public class ConnectionPool implements Subject {
     public void addActiveUser(String user)
     {
         activeUsers.add(user);
-        System.out.println("Active users: " + activeUsers);
-        Request updateUsersRequest = new Request(RequestType.UPDATE_ACTIVE_USERS, activeUsers);
+        Request updateUsersRequest = new Request(RequestType.UPDATE_ACTIVE_USERS, new ArrayList<>(activeUsers));
         support.firePropertyChange(updateUsersRequest.getType().toString(), null, updateUsersRequest);
     }
 
     public void removeActiveUser(String user)
     {
         activeUsers.remove(user);
-        System.out.println("Active users: " + activeUsers);
+        Request updateUsersRequest = new Request(RequestType.UPDATE_ACTIVE_USERS, new ArrayList<>(activeUsers));
+        support.firePropertyChange(updateUsersRequest.getType().toString(), null, updateUsersRequest);
+        support.firePropertyChange(RequestType.CLOSE_SOCKET.toString(), null ,user);
     }
 }

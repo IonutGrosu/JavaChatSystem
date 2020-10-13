@@ -1,6 +1,6 @@
 package chat.client.core;
 
-import chat.client.view.chats.ChatsController;
+import chat.client.view.publicChat.PublicChatController;
 import chat.client.view.login.LoginController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,7 +15,7 @@ public class ViewHandler
 
   private Stage primaryStage;
   private Scene loginScene;
-  private Scene chatsScene;
+  private Scene publicChatScene;
 
   public ViewHandler(ViewModelFactory vmf, Stage primaryStage)
   {
@@ -40,24 +40,25 @@ public class ViewHandler
       controller.init(this, vmf);
       loginScene = new Scene(root);
     }
-
+    loginScene.getStylesheets().add(getClass().getResource("../../shared/stylesheets/styles.css").toExternalForm());
     primaryStage.setTitle("Login");
     primaryStage.setScene(loginScene);
   }
 
-  public void openChatsView()
+  public void openPublicChatView()
   {
     FXMLLoader loader = new FXMLLoader();
 
-    if (chatsScene == null)
+    if (publicChatScene == null)
     {
-      Parent root = getRootByPath("../view/chats/ChatsView.fxml", loader);
-      ChatsController controller = loader.getController();
+      Parent root = getRootByPath("../view/publicChat/PublicChatView.fxml", loader);
+      PublicChatController controller = loader.getController();
       controller.init(this, vmf);
-      chatsScene = new Scene(root);
+      publicChatScene = new Scene(root);
     }
+    publicChatScene.getStylesheets().add(getClass().getResource("../../shared/stylesheets/styles.css").toExternalForm());
     primaryStage.setTitle("Chatting with friends");
-    primaryStage.setScene(chatsScene);
+    primaryStage.setScene(publicChatScene);
   }
 
   private Parent getRootByPath(String path, FXMLLoader loader)

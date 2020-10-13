@@ -7,4 +7,6 @@ public interface ModelInterface extends Subject
     void startClient(String username);
 
     void sendMessage(String message);
+
+    void disconnectUser();
 }

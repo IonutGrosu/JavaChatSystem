@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="root" stylesheets="@../../../shared/stylesheets/styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chat.client.view.publicChat.PublicChatController">
+   <children>
+      <Label layoutX="120.0" layoutY="1.0" prefHeight="30.0" prefWidth="475.0" style="-fx-text-fill: white;" text="Public chat room">
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+         <font>
+            <Font name="System Bold" size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="messageInputField" layoutX="120.0" layoutY="360.0" prefHeight="30.0" prefWidth="400.0" />
+      <Button layoutX="540.0" layoutY="360.0" mnemonicParsing="false" onAction="#onSendButton" prefHeight="30.0" prefWidth="50.0" text="Send" />
+      <VBox prefHeight="400.0" prefWidth="120.0" style="-fx-alignment: center;">
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="120.0" style="-fx-text-fill: white; -fx-alignment: center-left;" text="Active users" textAlignment="CENTER">
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+               <font>
+                  <Font name="System Bold" size="17.0" />
+               </font>
+            </Label>
+            <ScrollPane fx:id="activeUsersScrollPane" hbarPolicy="NEVER" maxWidth="100.0" prefHeight="280.0" prefWidth="120.0" vbarPolicy="NEVER">
+               <content>
+                  <VBox fx:id="activeUsersContainer" alignment="TOP_CENTER" fillWidth="false" prefHeight="270.0" prefWidth="100.0" />
+               </content>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </ScrollPane>
+            <Button mnemonicParsing="false" onAction="#onNewChatButton" prefHeight="30.0" prefWidth="100.0" text="New chat">
+               <VBox.margin>
+                  <Insets bottom="5.0" top="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#onDisconnectButton" prefHeight="30.0" prefWidth="100.0" text="Disconnect">
+               <VBox.margin>
+                  <Insets bottom="10.0" top="5.0" />
+               </VBox.margin></Button>
+         </children>
+      </VBox>
+      <ScrollPane fx:id="messagesScrollPane" hbarPolicy="NEVER" layoutX="120.0" layoutY="31.0" prefHeight="320.0" prefWidth="470.0" vbarPolicy="NEVER">
+         <content>
+            <VBox fx:id="messagesContainer" alignment="BASELINE_LEFT" prefHeight="320.0" prefWidth="470.0" />
+         </content>
+      </ScrollPane>
+   </children>
+</AnchorPane>
