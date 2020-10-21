@@ -58,7 +58,6 @@ public class ServerModel implements ServerModelInterface {
     @Override
     public void sendActiveUsersToClient(String username) {
         ArrayList<String> activeUsernames = new ArrayList<>();
-        System.out.println("******" + username);
 
         for (User user :connectedUsers) {
             activeUsernames.add(user.getUsername());
@@ -74,13 +73,19 @@ public class ServerModel implements ServerModelInterface {
         support.firePropertyChange(sendPublicMessageRequest.getType().toString(), null, sendPublicMessageRequest);
     }
 
+    @Override
+    public void disconnect(User user) {
+        connectedUsers.remove(user);
+        updateActiveUsers();
+    }
+
     public void updateActiveUsers() {
         ArrayList<String> activeUsernames = new ArrayList<>();
 
         for (User user :connectedUsers) {
             activeUsernames.add(user.getUsername());
         }
-
+        System.out.println("updated user list: " + activeUsernames);
         Request updateActiveUsersRequest = new Request(RequestType.UPDATE_ACTIVE_USERS, activeUsernames);
         support.firePropertyChange(updateActiveUsersRequest.getType().toString(), null, updateActiveUsersRequest);
     }

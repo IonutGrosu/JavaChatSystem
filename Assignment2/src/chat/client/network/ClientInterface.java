@@ -12,4 +12,6 @@ public interface ClientInterface extends Subject {
     void getActiveUsersList(User user);
 
     void sendPublicMessage(Message messageToSend);
+
+    void disconnect(User user);
 }

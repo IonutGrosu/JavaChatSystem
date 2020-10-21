@@ -10,4 +10,6 @@ public interface ServerModelInterface extends Subject {
     void sendActiveUsersToClient(String arg);
 
     void sendPublicMessage(Message arg);
+
+    void disconnect(User userDisconnecting);
 }

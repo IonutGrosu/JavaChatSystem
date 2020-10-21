@@ -139,4 +139,9 @@ public class Model implements ModelInterface {
         //System.out.println("sending previous avatar image: index: " + previousIndex + ", path: " + previousAvatarImage);
         support.firePropertyChange(RequestType.PREVIOUS_AVATAR_IMAGE.toString(), previousIndex, previousAvatarImage);
     }
+
+    @Override
+    public void disconnect() {
+        client.disconnect(user);
+    }
 }

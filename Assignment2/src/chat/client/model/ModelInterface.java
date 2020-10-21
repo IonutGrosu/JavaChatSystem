@@ -17,4 +17,6 @@ public interface ModelInterface extends Subject
     void getNextAvatarImage(int currentIndex);
 
     void getPreviousAvatarImage(int currentIndex);
+
+    void disconnect();
 }

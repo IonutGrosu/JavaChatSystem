@@ -47,35 +47,37 @@ public class ServerHandler implements Runnable {
     }
 
     private void writeToClient(PropertyChangeEvent event){
-        try {
-            Request requestToClient = (Request)event.getNewValue();
-            switch (requestToClient.getType()) {
-                case SUCCESSFUL_LOGIN:
-                case EXISTING_USERNAME: {
-                    User userToSendTo = (User) requestToClient.getArg();
-                    if (clientUsername.equals(userToSendTo.getUsername())) {
-                        outToClient.writeObject(requestToClient);
-                        System.out.println("Request to client(" + clientUsername + "): " + requestToClient.getType());
-                    }
-                    break;
-                }
-                case UPDATE_ACTIVE_USERS:
-                case RECEIVE_PUBLIC:{
-                    outToClient.writeObject(requestToClient);
-                    System.out.println("Request to all clients: " + requestToClient.getType());
-                    break;
-                }
-                case GET_ACTIVE_USERS:{
-                    String clientToSendTo = (String)event.getOldValue();
-                    if (clientToSendTo.equals(clientUsername)){
-                        outToClient.writeObject(requestToClient);
-                        System.out.println("Request to client(" + clientUsername + "): " + requestToClient.getType());
+        if (!socket.isClosed()){
+            try {
+                Request requestToClient = (Request)event.getNewValue();
+                switch (requestToClient.getType()) {
+                    case SUCCESSFUL_LOGIN:
+                    case EXISTING_USERNAME: {
+                        User userToSendTo = (User) requestToClient.getArg();
+                        if (clientUsername.equals(userToSendTo.getUsername())) {
+                            outToClient.writeObject(requestToClient);
+                            System.out.println("Request to client(" + clientUsername + "): " + requestToClient.getType());
+                        }
                         break;
                     }
+                    case UPDATE_ACTIVE_USERS:
+                    case RECEIVE_PUBLIC:{
+                        outToClient.writeObject(requestToClient);
+                        System.out.println("Request to all clients: " + requestToClient.getType());
+                        break;
+                    }
+                    case GET_ACTIVE_USERS:{
+                        String clientToSendTo = (String)event.getOldValue();
+                        if (clientToSendTo.equals(clientUsername)){
+                            outToClient.writeObject(requestToClient);
+                            System.out.println("Request to client(" + clientUsername + "): " + requestToClient.getType());
+                            break;
+                        }
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -121,24 +123,39 @@ public class ServerHandler implements Runnable {
             while (true) {
                 Request clientRequest = (Request) inFromClient.readObject();
                 System.out.println("< Request from client: " + clientRequest.getType());
-                switch (clientRequest.getType()) {
-                    case LOGIN: {
-                        User clientUser = (User) clientRequest.getArg();
-                        clientUsername = clientUser.getUsername();
-                        model.loginUser(clientUser);
-                        break;
+                if (!clientRequest.getType().equals(RequestType.DISCONNECT)){
+                    switch (clientRequest.getType()) {
+                        case LOGIN: {
+                            User clientUser = (User) clientRequest.getArg();
+                            clientUsername = clientUser.getUsername();
+                            model.loginUser(clientUser);
+                            break;
+                        }
+                        case GET_ACTIVE_USERS: {
+                            System.out.println((String) clientRequest.getArg());
+                            model.sendActiveUsersToClient((String) clientRequest.getArg());
+                            break;
+                        }
+                        case SEND_PUBLIC: {
+                            model.sendPublicMessage((Message) clientRequest.getArg());
+                            break;
+                        }
+                        default:
+                            System.out.println("*Request: " + clientRequest + " could not be handled.");
                     }
-                    case GET_ACTIVE_USERS: {
-                        System.out.println((String) clientRequest.getArg());
-                        model.sendActiveUsersToClient((String) clientRequest.getArg());
-                        break;
-                    }
-                    case SEND_PUBLIC: {
-                        model.sendPublicMessage((Message) clientRequest.getArg());
-                        break;
-                    }
-                    default:
-                        System.out.println("*Request: " + clientRequest + " could not be handled.");
+                }else {
+                    User userDisconnecting = (User) clientRequest.getArg();
+
+                    //TODO remove listeners
+                    model.removeListener(RequestType.SUCCESSFUL_LOGIN.toString(), this::writeToClient);
+                    model.removeListener(RequestType.EXISTING_USERNAME.toString(), this::writeToClient);
+                    model.removeListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::writeToClient);
+                    model.removeListener(RequestType.GET_ACTIVE_USERS.toString(), this::writeToClient);
+                    model.removeListener(RequestType.RECEIVE_PUBLIC.toString(), this::writeToClient);
+                    //TODO close socket
+                    socket.close();
+                    //TODO remove from active
+                    model.disconnect(userDisconnecting);
                 }
             }
         } catch (IOException | ClassNotFoundException e) {

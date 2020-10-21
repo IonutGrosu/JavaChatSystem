@@ -62,6 +62,12 @@ public class Client implements ClientInterface {
         writeToServer(sendPublicMessageRequest);
     }
 
+    @Override
+    public void disconnect(User user) {
+        Request disconnectRequest = new Request(RequestType.DISCONNECT, user);
+        writeToServer(disconnectRequest);
+    }
+
     private void listenToServer(ObjectInputStream inFromServer) {
         try {
             while (true) {

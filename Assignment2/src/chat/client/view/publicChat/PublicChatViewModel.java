@@ -136,4 +136,8 @@ public class PublicChatViewModel implements Subject
   public void sendPublicMessage() {
     model.sendPublicMessage(sentMessageProperty.getValue());
   }
+
+  public void disconnect() {
+    model.disconnect();
+  }
 }
