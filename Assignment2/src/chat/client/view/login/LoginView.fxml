@@ -3,23 +3,28 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@../../../shared/stylesheets/styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chat.client.view.login.LoginController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="root" stylesheets="@../../../shared/stylesheets/styles.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="chat.client.view.login.LoginController">
    <children>
-      <Button fx:id="loginButton" layoutX="276.0" layoutY="296.0" mnemonicParsing="false" onAction="#onLoginButton" text="Get in" />
-      <Label alignment="CENTER" layoutX="109.0" layoutY="37.0" prefHeight="99.0" prefWidth="385.0" styleClass="yellowText" text="Welcome to deep web's worst chat system!" textAlignment="CENTER" wrapText="true">
+      <Button fx:id="loginButton" layoutX="275.0" layoutY="315.0" mnemonicParsing="false" onAction="#onLoginButton" text="Get in" />
+      <Label alignment="CENTER" layoutX="108.0" prefHeight="99.0" prefWidth="385.0" styleClass="yellowText" text="Welcome to deep web's worst chat system!" textAlignment="CENTER" wrapText="true">
          <font>
             <Font name="System Bold" size="28.0" />
          </font>
       </Label>
-      <TextField fx:id="usernameTextField" layoutX="226.0" layoutY="227.0" />
-      <Label layoutX="199.0" layoutY="191.0" styleClass="yellowText" text="How should we call you?">
+      <TextField fx:id="usernameTextField" layoutX="275.0" layoutY="117.0" />
+      <Label layoutX="179.0" layoutY="114.0" styleClass="yellowText" text="Username:">
          <font>
-            <Font name="System Italic" size="19.0" />
+            <Font name="System Bold" size="19.0" />
          </font>
       </Label>
-      <Label fx:id="loginErrorLabel" layoutX="151.0" layoutY="262.0" styleClass="errorLabel" text="This username is already in use. Choose another one." />
+      <Label fx:id="loginErrorLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="152.0" layoutY="153.0" styleClass="errorLabel" text="This username is already in use. Choose another one." />
+      <ImageView fx:id="previousButton" fitHeight="25.0" fitWidth="25.0" layoutX="220.0" layoutY="238.0" onMouseClicked="#onPreviousImageButton" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="nextButton" fitHeight="25.0" fitWidth="25.0" layoutX="355.0" layoutY="238.0" onMouseClicked="#onNextImageButton" pickOnBounds="true" preserveRatio="true" />
+      <Circle fx:id="avatarContainer" fill="#fcce64" layoutX="300.0" layoutY="238.0" onMouseClicked="#loadImages" radius="50.0" stroke="TRANSPARENT" strokeType="INSIDE" />
    </children>
 </AnchorPane>

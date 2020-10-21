@@ -31,22 +31,17 @@
                   <Font name="System Bold" size="17.0" />
                </font>
             </Label>
-            <ScrollPane fx:id="activeUsersScrollPane" hbarPolicy="NEVER" maxWidth="100.0" prefHeight="280.0" prefWidth="120.0" vbarPolicy="NEVER">
+            <ScrollPane fx:id="activeUsersScrollPane" hbarPolicy="NEVER" maxWidth="100.0" prefHeight="320.0" prefWidth="120.0" vbarPolicy="NEVER">
                <content>
-                  <VBox fx:id="activeUsersContainer" alignment="TOP_CENTER" fillWidth="false" prefHeight="270.0" prefWidth="100.0" />
+                  <VBox fx:id="activeUsersContainer" alignment="TOP_CENTER" fillWidth="false" prefHeight="320.0" prefWidth="100.0" />
                </content>
                <VBox.margin>
                   <Insets />
                </VBox.margin>
             </ScrollPane>
-            <Button mnemonicParsing="false" onAction="#onNewChatButton" prefHeight="30.0" prefWidth="100.0" text="New chat">
+            <Button mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Disconnect">
                <VBox.margin>
-                  <Insets bottom="5.0" top="10.0" />
-               </VBox.margin>
-            </Button>
-            <Button mnemonicParsing="false" onAction="#onDisconnectButton" prefHeight="30.0" prefWidth="100.0" text="Disconnect">
-               <VBox.margin>
-                  <Insets bottom="10.0" top="5.0" />
+                  <Insets bottom="10.0" top="10.0" />
                </VBox.margin></Button>
          </children>
       </VBox>

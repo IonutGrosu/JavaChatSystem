@@ -1,7 +1,7 @@
 package chat.client.core;
 
 import chat.client.network.ClientInterface;
-import chat.client.network.ClientSocket;
+import chat.client.network.Client;
 
 public class ClientFactory
 {
@@ -9,7 +9,7 @@ public class ClientFactory
 
     public ClientInterface getClient()
     {
-        if (client == null) client = new ClientSocket();
+        if (client == null) client = new Client();
         return client;
     }
 }

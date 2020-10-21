@@ -1,11 +1,15 @@
 package chat.client.network;
 
+import chat.shared.transferObjects.Message;
+import chat.shared.transferObjects.User;
 import chat.shared.util.Subject;
 
 public interface ClientInterface extends Subject {
-    void startClient(String username);
+    void startClient();
 
-    void sendMessageToAll(String message);
+    void login(User user);
 
-    void disconnectUser();
+    void getActiveUsersList(User user);
+
+    void sendPublicMessage(Message messageToSend);
 }

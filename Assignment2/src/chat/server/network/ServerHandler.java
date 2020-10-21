@@ -1,104 +1,147 @@
 package chat.server.network;
 
-import chat.server.model.ConnectionPool;
+import chat.server.model.ServerModel;
+import chat.server.model.ServerModelInterface;
+import chat.shared.transferObjects.Message;
 import chat.shared.transferObjects.Request;
 import chat.shared.transferObjects.RequestType;
+import chat.shared.transferObjects.User;
 
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class ServerHandler implements Runnable {
     private Socket socket;
-    private ConnectionPool cp;
+    private ServerModelInterface model;
+
+    private String clientUsername;
 
     private ObjectInputStream inFromClient;
     private ObjectOutputStream outToClient;
 
-    private String username;
-    private Boolean socketClosed;
-
-    public ServerHandler(Socket socket, ConnectionPool cp)
-    {
+    public ServerHandler(Socket socket, ServerModel model) {
         this.socket = socket;
-        socketClosed = false;
-        this.cp = cp;
+        this.model = model;
 
-        cp.addListener(RequestType.SEND_PUBLIC.toString(), this::sendMessageToAll);
-        cp.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::updateActiveUsers);
-        cp.addListener(RequestType.CLOSE_SOCKET.toString(), this::closeSocket);
-
-        try
-        {
+        try {
             inFromClient = new ObjectInputStream(socket.getInputStream());
             outToClient = new ObjectOutputStream(socket.getOutputStream());
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    private void closeSocket(PropertyChangeEvent propertyChangeEvent) {
-        if (this.username.equals((String)propertyChangeEvent.getNewValue()))
-        {
-            try {
-                socket.close();
-                socketClosed = true;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void updateActiveUsers(PropertyChangeEvent propertyChangeEvent) {
-        try {
-            Request request = (Request) propertyChangeEvent.getNewValue();
-            ArrayList<String> list = (ArrayList<String>) request.getArg();
-            System.out.println("user list sent to the user: "+list.toString());
-            outToClient.writeObject(propertyChangeEvent.getNewValue());
-        } catch (IOException e) {
-            //e.printStackTrace();
-        }
-    }
-
-    private void sendMessageToAll(PropertyChangeEvent propertyChangeEvent) {
-        try {
-            Request request = (Request) propertyChangeEvent.getNewValue();
-            outToClient.writeObject(request);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+//        model.addListener(RequestType.SUCCESSFUL_LOGIN.toString(), this::writeToSpecificClient);
+//        model.addListener(RequestType.EXISTING_USERNAME.toString(), this::writeToSpecificClient);
+//        model.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::writeToClients);
+//        model.addListener(RequestType.GET_ACTIVE_USERS.toString(), this::sendUserListToSpecificClient);
+//        model.addListener(RequestType.RECEIVE_PUBLIC.toString(), this::writeToClients);
+        //TODO merge all this 3 methods in a single one with switch
+        model.addListener(RequestType.SUCCESSFUL_LOGIN.toString(), this::writeToClient);
+        model.addListener(RequestType.EXISTING_USERNAME.toString(), this::writeToClient);
+        model.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::writeToClient);
+        model.addListener(RequestType.GET_ACTIVE_USERS.toString(), this::writeToClient);
+        model.addListener(RequestType.RECEIVE_PUBLIC.toString(), this::writeToClient);
     }
 
-    @Override public void run()
-    {
-        try
-        {
-            while (!socketClosed) {
-                Request clientRequest = (Request) inFromClient.readObject();
-                switch (clientRequest.getType())
-                {
-                    case NEW_USER:
-                        cp.addActiveUser((String)clientRequest.getArg());
-                        this.username = (String)clientRequest.getArg();
+    private void writeToClient(PropertyChangeEvent event){
+        try {
+            Request requestToClient = (Request)event.getNewValue();
+            switch (requestToClient.getType()) {
+                case SUCCESSFUL_LOGIN:
+                case EXISTING_USERNAME: {
+                    User userToSendTo = (User) requestToClient.getArg();
+                    if (clientUsername.equals(userToSendTo.getUsername())) {
+                        outToClient.writeObject(requestToClient);
+                        System.out.println("Request to client(" + clientUsername + "): " + requestToClient.getType());
+                    }
+                    break;
+                }
+                case UPDATE_ACTIVE_USERS:
+                case RECEIVE_PUBLIC:{
+                    outToClient.writeObject(requestToClient);
+                    System.out.println("Request to all clients: " + requestToClient.getType());
+                    break;
+                }
+                case GET_ACTIVE_USERS:{
+                    String clientToSendTo = (String)event.getOldValue();
+                    if (clientToSendTo.equals(clientUsername)){
+                        outToClient.writeObject(requestToClient);
+                        System.out.println("Request to client(" + clientUsername + "): " + requestToClient.getType());
                         break;
-                    case DISCONNECT:
-                        cp.removeActiveUser((String)clientRequest.getArg());
-                        break;
-                    case SEND_PRIVATE:
-                        break;
-                    case SEND_PUBLIC:
-                        cp.sendToAll(clientRequest);
-                        break;
+                    }
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        catch (IOException | ClassNotFoundException e)
-        {
+    }
+
+    private void sendUserListToSpecificClient(PropertyChangeEvent propertyChangeEvent) {
+        try {
+            Request requestToClient = (Request)propertyChangeEvent.getNewValue();
+            String clientToSendTo = (String)propertyChangeEvent.getOldValue();
+            if (clientToSendTo.equals(clientUsername)){
+                outToClient.writeObject(requestToClient);
+                System.out.println("Request to client(" + clientUsername + "): " + requestToClient.getType());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeToClients(PropertyChangeEvent propertyChangeEvent) {
+        try {
+            Request requestToClient = (Request)propertyChangeEvent.getNewValue();
+            outToClient.writeObject(requestToClient);
+            System.out.println("Request to all clients: " + requestToClient.getType());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeToSpecificClient(PropertyChangeEvent propertyChangeEvent) {
+        try {
+            Request requestToClient = (Request) propertyChangeEvent.getNewValue();
+            User userToSendTo = (User) requestToClient.getArg();
+            if (clientUsername.equals(userToSendTo.getUsername())) {
+                outToClient.writeObject(requestToClient);
+                System.out.println("Request to client(" + clientUsername + "): " + requestToClient.getType());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            while (true) {
+                Request clientRequest = (Request) inFromClient.readObject();
+                System.out.println("< Request from client: " + clientRequest.getType());
+                switch (clientRequest.getType()) {
+                    case LOGIN: {
+                        User clientUser = (User) clientRequest.getArg();
+                        clientUsername = clientUser.getUsername();
+                        model.loginUser(clientUser);
+                        break;
+                    }
+                    case GET_ACTIVE_USERS: {
+                        System.out.println((String) clientRequest.getArg());
+                        model.sendActiveUsersToClient((String) clientRequest.getArg());
+                        break;
+                    }
+                    case SEND_PUBLIC: {
+                        model.sendPublicMessage((Message) clientRequest.getArg());
+                        break;
+                    }
+                    default:
+                        System.out.println("*Request: " + clientRequest + " could not be handled.");
+                }
+            }
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

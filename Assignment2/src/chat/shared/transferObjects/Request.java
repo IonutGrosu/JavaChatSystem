@@ -18,4 +18,8 @@ public class Request implements Serializable {
     public Object getArg() {
         return arg;
     }
+
+    public String toString(){
+        return type + ", " + arg.toString();
+    }
 }

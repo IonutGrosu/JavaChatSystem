@@ -3,10 +3,14 @@ package chat.client.view.publicChat;
 import chat.client.model.ModelInterface;
 import chat.shared.transferObjects.Message;
 import chat.shared.transferObjects.RequestType;
+import chat.shared.transferObjects.User;
 import chat.shared.util.Subject;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -29,50 +33,72 @@ public class PublicChatViewModel implements Subject
 
   public PublicChatViewModel(ModelInterface model)
   {
-    this.model = model;
+    support = new PropertyChangeSupport(this);
 
-    this.model.addListener(RequestType.SEND_PUBLIC.toString(), this::receivePublicMessage);
-    this.model.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::updateActiveUsers);
-    this.model.addListener(RequestType.NEW_USER.toString(), this::getUsername);
+    this.model = model;
 
     sentMessageProperty = new SimpleStringProperty("");
     lastSender = "";
 
-    support = new PropertyChangeSupport(this);
+    model.addListener("USERNAME", this::getClientUsername);
+    model.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::updateActiveUsers);
+    model.addListener(RequestType.GET_ACTIVE_USERS.toString(), this::updateActiveUsers);
+    model.addListener(RequestType.RECEIVE_PUBLIC.toString(), this::receivePublicMessage);
+
+    model.getUsername();
   }
 
-  private void getUsername(PropertyChangeEvent propertyChangeEvent) {
-    this.username = (String) propertyChangeEvent.getNewValue();
+  private void receivePublicMessage(PropertyChangeEvent event) {
+    Message receivedMessage = (Message) event.getNewValue();
+
+    support.firePropertyChange(RequestType.RECEIVE_PUBLIC.toString(), null, createMessageContainer(receivedMessage));
   }
 
-  private void updateActiveUsers(PropertyChangeEvent propertyChangeEvent) {
-    ArrayList<String> activeUsersList = (ArrayList<String>) propertyChangeEvent.getNewValue();
+  private void getClientUsername(PropertyChangeEvent event) {
+    username = (String)event.getNewValue();
+    //TODO check why i do not get to this event
+  }
+
+  private void updateActiveUsers(PropertyChangeEvent event) {
+    ArrayList<String> receivedUserList = (ArrayList<String>) event.getNewValue();
+    System.out.println("active users received froms server: " + receivedUserList.toString());
 
     activeUsersLabels = new ArrayList<>();
-    for (String activeUser : activeUsersList) {
-      Label activeUserToAdd = new Label(activeUser);
+
+    for (String s : receivedUserList) {
+      Label activeUserToAdd = new Label(s);
       activeUserToAdd.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-alignment: center;");
       activeUsersLabels.add(activeUserToAdd);
     }
-
     support.firePropertyChange(RequestType.UPDATE_ACTIVE_USERS.toString(), null, activeUsersLabels);
   }
 
   private HBox createMessageContainer(Message message){
+    User sender  = message.getSender();
+    String avatarPath = sender.getAvatarPath();
+    Image senderAvatarImg = new Image(avatarPath);
+    ImageView avatarImageView = new ImageView(senderAvatarImg);
+    avatarImageView.setFitWidth(20);
+    avatarImageView.setPreserveRatio(true);
+
     HBox hBoxContainer = new HBox();
     hBoxContainer.getStyleClass().add("hBoxMessageContainer");
     VBox vBoxContainer = new VBox();
     vBoxContainer.getStyleClass().add("vBoxMessageContainer");
+    HBox avatarPlusUsernameHBox = new HBox();
 
-    if (message.getSender().equals(username)) {
+    if (message.getSenderUsername().equals(username)) {
       hBoxContainer.getStyleClass().add("right");
       vBoxContainer.getStyleClass().add("right");
+      avatarPlusUsernameHBox.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
     }
 
-    if (!message.getSender().equals(lastSender)){
-      Label usernameLabel = new Label(message.getSender());
+    if (!message.getSenderUsername().equals(lastSender)){
+      Label usernameLabel = new Label(message.getSenderUsername());
       usernameLabel.getStyleClass().add("messageUsernameLabel");
-      vBoxContainer.getChildren().add(usernameLabel);
+      avatarPlusUsernameHBox.getChildren().add(avatarImageView);
+      avatarPlusUsernameHBox.getChildren().add(usernameLabel);
+      vBoxContainer.getChildren().add(avatarPlusUsernameHBox);
     }
 
     Label messageBodyLabel = new Label(message.getMessageBody());
@@ -80,26 +106,17 @@ public class PublicChatViewModel implements Subject
     messageBodyLabel.setWrapText(true);
     messageBodyLabel.setMaxWidth(300);
     vBoxContainer.getChildren().add(messageBodyLabel);
+
     hBoxContainer.getChildren().add(vBoxContainer);
 
-    lastSender = message.getSender();
+    lastSender = message.getSenderUsername();
 
     return hBoxContainer;
-  }
-
-  private void receivePublicMessage(PropertyChangeEvent propertyChangeEvent) {
-    Message receivedMessage = (Message) propertyChangeEvent.getNewValue();
-
-    support.firePropertyChange(RequestType.RECEIVE_PUBLIC.toString(), null, createMessageContainer(receivedMessage));
   }
 
   public StringProperty getSentMessageProperty()
   {
     return sentMessageProperty;
-  }
-
-  public void sendMessage() {
-    model.sendMessage(sentMessageProperty.getValue());
   }
 
   @Override
@@ -112,7 +129,11 @@ public class PublicChatViewModel implements Subject
     support.removePropertyChangeListener(eventName, listener);
   }
 
-  public void disconnectUser() {
-    model.disconnectUser();
+  public void getActiveUsersList() {
+    model.getActiveUsersList();
+  }
+
+  public void sendPublicMessage() {
+    model.sendPublicMessage(sentMessageProperty.getValue());
   }
 }

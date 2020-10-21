@@ -1,9 +1,6 @@
 .root{
     -fx-background-color: #121212;
 }
-/*HBox{*/
-/*    -fx-padding: 5px;*/
-/*}*/
 
 .left{
     -fx-alignment: center-left;

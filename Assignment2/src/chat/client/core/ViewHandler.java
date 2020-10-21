@@ -28,6 +28,7 @@ public class ViewHandler
   {
     openLoginView();
     primaryStage.show();
+
   }
 
   public void openLoginView()
@@ -45,7 +46,7 @@ public class ViewHandler
     primaryStage.setScene(loginScene);
   }
 
-  public void openPublicChatView()
+  public void openPublicChatView(String username)
   {
     FXMLLoader loader = new FXMLLoader();
 
@@ -57,7 +58,7 @@ public class ViewHandler
       publicChatScene = new Scene(root);
     }
     publicChatScene.getStylesheets().add(getClass().getResource("../../shared/stylesheets/styles.css").toExternalForm());
-    primaryStage.setTitle("Chatting with friends");
+    primaryStage.setTitle(username);
     primaryStage.setScene(publicChatScene);
   }
 

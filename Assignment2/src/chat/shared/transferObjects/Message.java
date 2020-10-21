@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
     private String messageBody;
-    private String sender;
+    private User sender;
 
-    public Message(String messageBody, String user)
+    public Message(String messageBody, User user)
     {
         this.messageBody = messageBody;
         this.sender = user;
@@ -17,13 +17,17 @@ public class Message implements Serializable {
         return messageBody;
     }
 
-    public String getSender()
+    public String getSenderUsername()
     {
+        return sender.getUsername();
+    }
+
+    public User getSender(){
         return sender;
     }
 
     @Override public String toString()
     {
-        return sender + ": " + messageBody;
+        return sender.getUsername() + ": " + messageBody;
     }
 }

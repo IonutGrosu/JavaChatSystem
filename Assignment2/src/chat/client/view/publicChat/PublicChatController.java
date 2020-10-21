@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -20,71 +21,77 @@ import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.util.ArrayList;
 
-public class PublicChatController implements ViewController
-{
-  @FXML private VBox activeUsersContainer;
-  @FXML private VBox messagesContainer;
-  @FXML private TextField messageInputField;
+public class PublicChatController implements ViewController {
+    @FXML
+    private ScrollPane messagesScrollPane;
+    @FXML
+    private VBox activeUsersContainer;
+    @FXML
+    private VBox messagesContainer;
+    @FXML
+    private TextField messageInputField;
 
-  private ViewHandler vh;
-  private PublicChatViewModel vm;
+    private ViewHandler vh;
+    private PublicChatViewModel vm;
 
-  @Override public void init(ViewHandler vh, ViewModelFactory vmf)
-  {
-    this.vh = vh;
-    this.vm = vmf.getChatsVM();
+    @Override
+    public void init(ViewHandler vh, ViewModelFactory vmf) {
+        this.vh = vh;
+        this.vm = vmf.getChatsVM();
 
-    messageInputField.textProperty().bindBidirectional(vm.getSentMessageProperty());
+        messageInputField.textProperty().bindBidirectional(vm.getSentMessageProperty());
 
-    messageInputField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-      @Override
-      public void handle(KeyEvent keyEvent) {
-        if (keyEvent.getCode().equals(KeyCode.ENTER))
-          onSendButton();
-      }
-    });
+        vm.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::updateActiveUsers);
+        vm.addListener(RequestType.RECEIVE_PUBLIC.toString(), this::addReceivedPublicMessage);
 
-    vm.addListener(RequestType.UPDATE_ACTIVE_USERS.toString(), this::updateActiveUsers);
-    vm.addListener(RequestType.RECEIVE_PUBLIC.toString(), this::addReceivedMessage);
-  }
+        messageInputField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (keyEvent.getCode().equals(KeyCode.ENTER))
+                    onSendButton();
+            }
+        });
+        vm.getActiveUsersList();
+    }
 
-  void playSound() {
-    String path = "Assignment2/src/chat/shared/sounds/notification_sound_1.mp3";
-    Media media = new Media(new File(path).toURI().toString());
-    MediaPlayer mediaPlayer = new MediaPlayer(media);
-    mediaPlayer.play();
-  }
+    private void addReceivedPublicMessage(PropertyChangeEvent event) {
+        HBox receivedMessage = (HBox) event.getNewValue();
 
-  private void addReceivedMessage(PropertyChangeEvent propertyChangeEvent) {
-    HBox receivedMessage = (HBox) propertyChangeEvent.getNewValue();
+        playSound();
 
-    playSound();
+        Platform.runLater(() -> {
+            messagesContainer.getChildren().add(receivedMessage);
 
-    Platform.runLater(() -> {
-      messagesContainer.getChildren().add(receivedMessage);
-    });
+            messagesContainer.heightProperty().addListener(
+                    (observable) -> {
+                        messagesScrollPane.setVvalue(1.0d);
+                    }
+            );
+        });
+    }
 
-  }
+    private void updateActiveUsers(PropertyChangeEvent event) {
+        ArrayList<Label> activeUsersLabels = (ArrayList<Label>) event.getNewValue();
 
-  private void updateActiveUsers(PropertyChangeEvent propertyChangeEvent) {
-    ArrayList<Label> activeUsers = (ArrayList<Label>) propertyChangeEvent.getNewValue();
+        Platform.runLater(() -> {
+            activeUsersContainer.getChildren().clear();
+            activeUsersContainer.getChildren().addAll(activeUsersLabels);
+        });
+    }
 
-    Platform.runLater(() -> {
-      activeUsersContainer.getChildren().clear();
-      activeUsersContainer.getChildren().addAll(activeUsers);
-    });
-  }
+    private void playSound() {
+        String path = "Assignment2/src/chat/shared/sounds/notification_sound_1.mp3";
+        Media media = new Media(new File(path).toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.play();
+    }
 
-  public void onSendButton(){
-    vm.sendMessage();
-    messageInputField.textProperty().setValue("");
-  }
+    public void onSendButton() {
+        String imputedMessage = messageInputField.textProperty().getValue();
 
-  public void onNewChatButton() {
-  }
-
-  public void onDisconnectButton() {
-    vm.disconnectUser();
-    vh.openLoginView();
-  }
+        if (!imputedMessage.isEmpty()) {
+            vm.sendPublicMessage();
+            messageInputField.textProperty().setValue("");
+        }
+    }
 }

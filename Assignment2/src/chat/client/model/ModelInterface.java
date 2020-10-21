@@ -4,9 +4,17 @@ import chat.shared.util.Subject;
 
 public interface ModelInterface extends Subject
 {
-    void startClient(String username);
+    void login(String username);
 
-    void sendMessage(String message);
+    void getActiveUsersList();
 
-    void disconnectUser();
+    void sendPublicMessage(String value);
+
+    void getUsername();
+
+    void getFirstImages();
+
+    void getNextAvatarImage(int currentIndex);
+
+    void getPreviousAvatarImage(int currentIndex);
 }

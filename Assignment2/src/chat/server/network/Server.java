@@ -1,6 +1,6 @@
 package chat.server.network;
 
-import chat.server.model.ConnectionPool;
+import chat.server.model.ServerModel;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -9,20 +9,20 @@ import java.net.Socket;
 
 public class Server {
 
-    private ConnectionPool cp;
+    private ServerModel cp;
 
-    public Server(ConnectionPool cp) {
+    public Server(ServerModel cp) {
         this.cp = cp;
     }
 
     public void start() {
         try {
-            ServerSocket serverSocket = new ServerSocket(12345);
+            ServerSocket serverSocket = new ServerSocket(4567);
             System.out.println("Server started and listening on " + InetAddress.getLocalHost().getHostAddress());
 
             while (true) {
                 Socket socket = serverSocket.accept();
-                System.out.println("Client connected.");
+                System.out.println("\nClient connected.");
 
                 ServerHandler csh = new ServerHandler(socket, cp);
 
