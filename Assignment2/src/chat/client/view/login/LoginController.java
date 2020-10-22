@@ -5,7 +5,6 @@ import chat.client.core.ViewModelFactory;
 import chat.client.view.ViewController;
 import chat.shared.transferObjects.RequestType;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -19,8 +18,6 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 
 import java.beans.PropertyChangeEvent;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class LoginController implements ViewController {
@@ -97,17 +94,16 @@ public class LoginController implements ViewController {
 
     public void onLoginButton() {
         imputedUsername = usernameTextField.textProperty().getValue();
-        //TODO check if text field is not empty
-        vm.login(imputedUsername);
+        if (!imputedUsername.isEmpty()){
+            vm.login(imputedUsername);
+        }
     }
 
     public void onPreviousImageButton(MouseEvent mouseEvent) {
-        System.out.println("previous image..");
         vm.getPreviousAvatarImage();
     }
 
     public void onNextImageButton(MouseEvent mouseEvent) {
-        System.out.println("next image..");
         vm.getNextAvatarImage();
     }
 

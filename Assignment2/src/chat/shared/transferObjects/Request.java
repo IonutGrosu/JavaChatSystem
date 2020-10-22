@@ -19,7 +19,7 @@ public class Request implements Serializable {
         return arg;
     }
 
-    public String toString(){
+    public String toString() {
         return type + ", " + arg.toString();
     }
 }

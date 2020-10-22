@@ -7,9 +7,9 @@ import chat.shared.util.Subject;
 public interface ServerModelInterface extends Subject {
     void loginUser(User user);
 
-    void sendActiveUsersToClient(String arg);
+    void sendActiveUsersToClient(String username);
 
-    void sendPublicMessage(Message arg);
+    void sendPublicMessage(Message message);
 
     void disconnect(User userDisconnecting);
 }

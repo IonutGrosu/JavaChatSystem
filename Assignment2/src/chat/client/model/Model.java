@@ -50,11 +50,9 @@ public class Model implements ModelInterface {
         avatarImages.add("/chat/shared/pictures/male4.png");
         avatarImages.add("/chat/shared/pictures/previousArrow.png");
         avatarImages.add("/chat/shared/pictures/nextArrow.png");
-        //System.out.println("model loaded following images: " + avatarImages);
     }
 
     private void firePropertyForward(PropertyChangeEvent propertyChangeEvent) {
-        //System.out.println("firing event from model to vms: " + propertyChangeEvent.getPropertyName());
 
         if (propertyChangeEvent.getPropertyName().equals(RequestType.SUCCESSFUL_LOGIN.toString())) {
             User user = (User) propertyChangeEvent.getNewValue();
@@ -93,7 +91,6 @@ public class Model implements ModelInterface {
 
     @Override
     public void getUsername() {
-        //support.firePropertyChange("USERNAME", null, clientUsername);
         support.firePropertyChange("USERNAME", null, user.getUsername());
     }
 
@@ -103,7 +100,6 @@ public class Model implements ModelInterface {
         firstImages.add(avatarImages.get(0));//female1 image
         firstImages.add(avatarImages.get(avatarImages.size() - 1));//nextArrow image
         firstImages.add(avatarImages.get(avatarImages.size() - 2));//previousArrow image
-        //System.out.println("model sending following images: " + firstImages);
         support.firePropertyChange(RequestType.AVATAR_IMAGES.toString(), null, firstImages);
     }
 
@@ -117,9 +113,7 @@ public class Model implements ModelInterface {
             nextIndex = currentIndex + 1;
         }
         nextAvatarImage = avatarImages.get(nextIndex);
-        //selectedAvatar = nextAvatarImage;
         user.setAvatarPath(nextAvatarImage);
-        //System.out.println("sending next avatar image: index: " + nextIndex + ", path: " + nextAvatarImage);
         support.firePropertyChange(RequestType.NEXT_AVATAR_IMAGE.toString(), nextIndex, nextAvatarImage);
     }
 
@@ -134,9 +128,7 @@ public class Model implements ModelInterface {
             previousIndex = currentIndex - 1;
         }
         previousAvatarImage = avatarImages.get(previousIndex);
-        //selectedAvatar = previousAvatarImage;
         user.setAvatarPath(previousAvatarImage);
-        //System.out.println("sending previous avatar image: index: " + previousIndex + ", path: " + previousAvatarImage);
         support.firePropertyChange(RequestType.PREVIOUS_AVATAR_IMAGE.toString(), previousIndex, previousAvatarImage);
     }
 

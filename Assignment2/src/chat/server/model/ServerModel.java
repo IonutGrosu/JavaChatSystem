@@ -79,13 +79,12 @@ public class ServerModel implements ServerModelInterface {
         updateActiveUsers();
     }
 
-    public void updateActiveUsers() {
+    private void updateActiveUsers() {
         ArrayList<String> activeUsernames = new ArrayList<>();
 
         for (User user :connectedUsers) {
             activeUsernames.add(user.getUsername());
         }
-        System.out.println("updated user list: " + activeUsernames);
         Request updateActiveUsersRequest = new Request(RequestType.UPDATE_ACTIVE_USERS, activeUsernames);
         support.firePropertyChange(updateActiveUsersRequest.getType().toString(), null, updateActiveUsersRequest);
     }

@@ -36,7 +36,6 @@ public class LoginViewModel implements Subject {
 
     private void updateAvatarImage(PropertyChangeEvent event) {
         currentAvatarImageIndex = (int) event.getOldValue();
-        System.out.println("sending from vm to controller: " + event.getPropertyName() + event.getNewValue());
         support.firePropertyChange(RequestType.UPDATE_AVATAR_IMAGE.toString(), null, event.getNewValue());
     }
 
@@ -51,7 +50,6 @@ public class LoginViewModel implements Subject {
     }
 
     private void firePropertyForward(PropertyChangeEvent event) {
-        System.out.println("firing forward: " + event.getPropertyName());
         support.firePropertyChange(event);
     }
 
@@ -70,7 +68,6 @@ public class LoginViewModel implements Subject {
     }
 
     public void getFirstImages() {
-        System.out.println("vm asking for first images");
         model.getFirstImages();
     }
 

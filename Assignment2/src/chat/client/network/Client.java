@@ -21,8 +21,6 @@ public class Client implements ClientInterface {
     ObjectOutputStream outToServer;
     ObjectInputStream inFromServer;
 
-    //private String clientUsername; delete this if everything works fine
-
 
     public Client() {
         support = new PropertyChangeSupport(this);
@@ -30,7 +28,7 @@ public class Client implements ClientInterface {
 
     public void startClient() {
         try {
-            socket = new Socket("localhost", 4567);
+            socket = new Socket("localhost", 8546);
 
             outToServer = new ObjectOutputStream(socket.getOutputStream());
             inFromServer = new ObjectInputStream(socket.getInputStream());
@@ -45,9 +43,8 @@ public class Client implements ClientInterface {
 
     @Override
     public void login(User user) {
-        //clientUsername = user.getUsername(); delete this if everything works fine
         Request loginRequest = new Request(RequestType.LOGIN, user);
-       writeToServer(loginRequest);
+        writeToServer(loginRequest);
     }
 
     @Override
@@ -81,10 +78,9 @@ public class Client implements ClientInterface {
         }
     }
 
-    private void writeToServer(Request requestToServer){
+    private void writeToServer(Request requestToServer) {
         try {
-            System.out.println("> Request to server: " + requestToServer.toString());
-            outToServer.writeObject(requestToServer);
+            outToServer.writeUnshared(new Request(requestToServer.getType(), requestToServer.getArg()));
         } catch (IOException e) {
             e.printStackTrace();
         }

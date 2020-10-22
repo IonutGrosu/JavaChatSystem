@@ -61,7 +61,6 @@ public class PublicChatViewModel implements Subject
 
   private void updateActiveUsers(PropertyChangeEvent event) {
     ArrayList<String> receivedUserList = (ArrayList<String>) event.getNewValue();
-    System.out.println("active users received froms server: " + receivedUserList.toString());
 
     activeUsersLabels = new ArrayList<>();
 

@@ -6,28 +6,25 @@ public class Message implements Serializable {
     private String messageBody;
     private User sender;
 
-    public Message(String messageBody, User user)
-    {
+    public Message(String messageBody, User user) {
         this.messageBody = messageBody;
         this.sender = user;
     }
 
-    public String getMessageBody()
-    {
+    public String getMessageBody() {
         return messageBody;
     }
 
-    public String getSenderUsername()
-    {
+    public String getSenderUsername() {
         return sender.getUsername();
     }
 
-    public User getSender(){
+    public User getSender() {
         return sender;
     }
 
-    @Override public String toString()
-    {
+    @Override
+    public String toString() {
         return sender.getUsername() + ": " + messageBody;
     }
 }
